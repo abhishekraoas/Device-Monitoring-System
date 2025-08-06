@@ -1,53 +1,104 @@
 const express = require('express');
 const router = express.Router();
-const Device = require('../models/device.model');
+const deviceController = require('../controllers/device.controller'); // ✅ Adjust path if needed
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Device:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *         type:
- *           type: string
- *         status:
- *           type: string
- *         ipAddress:
- *           type: string
- *         cpuUsage:
- *           type: number
- *         memoryUsage:
- *           type: number
- *         temperature:
- *           type: number
+ * tags:
+ *   name: Devices
+ *   description: API for managing devices
  */
 
-// Get all devices
-router.get('/', async (req, res) => {
-  const devices = await Device.find();
-  res.json(devices);
-});
+/**
+ * @swagger
+ * /api/devices:
+ *   get:
+ *     summary: Get all devices
+ *     tags: [Devices]
+ *     responses:
+ *       200:
+ *         description: List of all devices
+ */
+router.get('/', deviceController.getAllDevices);
 
-// Add a device
-router.post('/', async (req, res) => {
-  const device = new Device(req.body);
-  await device.save();
-  res.status(201).json(device);
-});
+/**
+ * @swagger
+ * /api/devices:
+ *   post:
+ *     summary: Create a new device
+ *     tags: [Devices]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Device'
+ *     responses:
+ *       201:
+ *         description: Device created successfully
+ */
+router.post('/', deviceController.createDevice);
 
-// Update device
-router.put('/:id', async (req, res) => {
-  const updated = await Device.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updated);
-});
+/**
+ * @swagger
+ * /api/devices/{id}:
+ *   get:
+ *     summary: Get device by ID
+ *     tags: [Devices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Device found
+ *       404:
+ *         description: Device not found
+ */
+router.get('/:id', deviceController.getDeviceById);
 
-// Delete device
-router.delete('/:id', async (req, res) => {
-  await Device.findByIdAndDelete(req.params.id);
-  res.sendStatus(204);
-});
+/**
+ * @swagger
+ * /api/devices/{id}:
+ *   put:
+ *     summary: Update device by ID
+ *     tags: [Devices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Device'
+ *     responses:
+ *       200:
+ *         description: Device updated
+ */
+router.put('/:id', deviceController.updateDevice);
+
+/**
+ * @swagger
+ * /api/devices/{id}:
+ *   delete:
+ *     summary: Delete device by ID
+ *     tags: [Devices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Device deleted
+ */
+router.delete('/:id', deviceController.deleteDevice);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const Device = require("../models/Device");
+const Device = require("../models/device.model");
 
 // GET all devices
 exports.getAllDevices = async (req, res) => {
